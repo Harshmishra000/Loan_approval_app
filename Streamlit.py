@@ -2,16 +2,14 @@ import streamlit as st
 import pickle
 import numpy as np
 
-# 🔥 LOAD MODEL + SCALER
 model = pickle.load(open("model.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl", "rb"))
 
-st.title("💰 Loan Approval Prediction System")
+st.title(" Loan Approval Prediction System")
 st.subheader("Enter Details")
 
 col1, col2 = st.columns(2)
 
-# ---------- INPUT ----------
 with col1:
     Applicant_Income = st.number_input("Applicant Income", value=None, placeholder="e.g. 50000")
     Coapplicant_Income = st.number_input("Coapplicant Income", value=None, placeholder="e.g. 20000")
@@ -43,7 +41,6 @@ with col2:
     Gender = st.selectbox("Gender", ["Male", "Female"])
     Employer_Category = st.selectbox("Employer Category", ["Private", "Government", "Self", "Other"])
 
-# ---------- ENCODING ----------
 emp_map = {"Salaried":1, "Self-Employed":2, "Unemployed":0}
 mar_map = {"Married":1, "Single":0}
 gender_map = {"Male":1, "Female":0}
@@ -52,19 +49,17 @@ area_map = {"Urban":2, "Semiurban":1, "Rural":0}
 loan_map = {"Home":0, "Education":1, "Business":2, "Personal":3}
 employer_map = {"Private":0, "Government":1, "Self":2, "Other":3}
 
-# ---------- PREDICTION ----------
-if st.button("🔍 Predict Loan Status"):
+if st.button(" Predict Loan Status"):
 
-    # 🔥 VALIDATION
+    # VALIDATION
     if None in [
         Applicant_Income, Coapplicant_Income, Age, Dependents,
         Credit_Score, Existing_Loans, DTI_Ratio,
         Savings, Collateral_Value, Loan_Amount, Loan_Term
     ]:
-        st.warning("⚠️ Please fill all numeric fields")
+        st.warning(" Please fill all numeric fields")
         st.stop()
 
-    # Input
     input_data = np.array([[  
     Applicant_Income,
     Coapplicant_Income,
@@ -90,36 +85,34 @@ if st.button("🔍 Predict Loan Status"):
     prob = model.predict_proba(input_data)[0][1]
 
    
-    # ---------- FINAL DECISION ----------
     approved = False
 
     if Credit_Score < 650:
-        st.error("❌ Loan Rejected (Low Credit Score)")
+        st.error(" Loan Rejected (Low Credit Score)")
 
     elif DTI_Ratio > 0.6:
-        st.error("❌ Loan Rejected (High Debt-to-Income Ratio)")
+        st.error(" Loan Rejected (High Debt-to-Income Ratio)")
 
     elif prob > 0.7:
-        st.success("✅ Loan Approved")
+        st.success(" Loan Approved")
         st.balloons()
         approved = True
 
     elif prob > 0.4:
-        st.warning("⚠️ Borderline Case – Improve Profile")
+        st.warning(" Borderline Case – Improve Profile")
 
     else:
-        st.error("❌ Loan Rejected")
+        st.error(" Loan Rejected")
     
 
-    # ---------- INSIGHT ----------
     if not approved:
-        st.markdown("### 🔍 Quick Insight:")
+        st.markdown("###  Quick Insight:")
 
         if Credit_Score < 650:
-            st.warning("⚠️ Improve Credit Score")
+            st.warning(" Improve Credit Score")
         elif DTI_Ratio > 0.6:
-            st.warning("⚠️ Reduce Debt Burden")
+            st.warning(" Reduce Debt Burden")
         elif prob > 0.4:
-            st.warning("💡 Moderate chances, improve profile")
+            st.warning(" Moderate chances, improve profile")
         else:
-            st.error("💡 Low chances, improve financials")
+            st.error(" Low chances, improve financials")
